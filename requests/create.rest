@@ -1,0 +1,20 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Business at the speed of thought",
+    "author": "Bill Gates",
+    "url": "www.microsoft.com",
+    "likes": 22
+}
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Get rich quick",
+    "author": "Napoleon Hill",
+    "url": "www.ponziscamsfakewebsite.com",
+    "likes": 15
+}
