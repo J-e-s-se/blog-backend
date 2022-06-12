@@ -9,10 +9,10 @@ const blogsRouter = require('./controllers/blogs')
 
 const mongoUrl = config.MONGODB_URI
 mongoose
-    .connect(mongoUrl)
-    .then(() => {
-        console.log('connected to mongodb')
-    })
+  .connect(mongoUrl)
+  .then(() => {
+    console.log('connected to mongodb')
+  })
 
 app.use(cors())
 app.use(express.json())
