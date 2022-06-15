@@ -1,0 +1,22 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImppbWNyb3cyOTgiLCJpZCI6IjYyYTlhOWIzYmVkYjJkZWQwMDEwZDgyNCIsImlhdCI6MTY1NTMxNTI4NCwiZXhwIjoxNjU1MzE4ODg0fQ.uWnEfIq_dUZgVaQXTOFHguGpWtzEaSIQM8G3dRJvi9k
+
+{
+    "title": "How to train your dragon",
+    "author": "Bin Zelt",
+    "url": "www.dragoklajnify.com",
+    "likes": 389
+}
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImppbWNyb3cyOTgiLCJpZCI6IjYyYTlhOWIzYmVkYjJkZWQwMDEwZDgyNCIsImlhdCI6MTY1NTMxNTI4NCwiZXhwIjoxNjU1MzE4ODg0fQ.uWnEfIq_dUZgVaQXTOFHguGpWtzEaSIQM8G3dRJvi9k
+
+{
+    "title": "Quick money online",
+    "author": "Money Master",
+    "url": "www.moneyalkdfasw.com",
+    "likes": 9
+}

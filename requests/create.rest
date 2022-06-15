@@ -2,9 +2,9 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Business at the speed of thought",
-    "author": "Bill Gates",
-    "url": "www.microsoft.com",
+    "title": "Keep it simple",
+    "author": "Simple Man",
+    "url": "www.simpleprogramming.com",
     "likes": 22
 }
 

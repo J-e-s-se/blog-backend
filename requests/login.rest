@@ -1,0 +1,20 @@
+GET http://localhost:3003/api/users
+
+###
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+    "username": "mackzucky55",
+    "password": "dontstopfighting@$$[]{id}"
+}
+
+
+###
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+    "username": "jimcrow298",
+    "password": "vip{29}}[#1*1*#]"
+}

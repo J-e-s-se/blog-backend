@@ -1,5 +1,7 @@
 const app = require('../app')
+const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./test_helper')
@@ -122,6 +124,110 @@ describe('updating a blog post', () => {
 
     expect(updatedBlogs[0]).toEqual({ ...blogToBeUpdated , likes: blogUpdate.likes })
   })
+})
+
+describe('creating a new user', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const username = 'falzbadman98'
+    const name = 'Falz Man'
+    const password = '298ei09{fz}'
+    const passwordHash = await bcrypt.hash(password, 10)
+
+    const user = new User({ username, name, passwordHash })
+    await user.save()
+
+  })
+
+  test('fails with status code 400 when username is not given', async () => {
+    const invalidUser = {
+      name: 'Jim Ben',
+      password: 'w28o292II'
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(invalidUser)
+      .expect(400)
+
+    expect(response.body).toContain('username not given')
+
+    const users = await helper.usersInDb()
+    expect(users).toHaveLength(1)
+  })
+
+  test('fails with status code 400 when password is not given', async () => {
+    const invalidUser = {
+      username: 'indiesman98',
+      name: 'Jim Ben',
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(invalidUser)
+      .expect(400)
+
+    expect(response.body).toContain('password not given')
+
+    const users = await helper.usersInDb()
+    expect(users).toHaveLength(1)
+  })
+
+  test('fails with status code 400 when username is shorter than 3 characters', async () => {
+    const invalidUser = {
+      username: 'Me',
+      name: 'Ben Ten',
+      password: 'weshallseetomorrow398#'
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(invalidUser)
+      .expect(400)
+
+    expect(response.body).toContain('username must be at least 3 characters long')
+
+    const users = await helper.usersInDb()
+    expect(users).toHaveLength(1)
+  })
+
+  test('fails with status code 400 when password is shorter than 3 characters', async () => {
+    const invalidUser = {
+      name: 'Mr John',
+      username: 'indiesman98',
+      password: 'we'
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(invalidUser)
+      .expect(400)
+
+    expect(response.body).toContain('password must be at least 3 characters long')
+
+    const users = await helper.usersInDb()
+    expect(users).toHaveLength(1)
+  })
+
+  test('fails with status code 400 when username is not unique', async () => {
+    const invalidUser = {
+      username: 'falzbadman98',
+      name: 'Bin Zip',
+      password: '2938[li**9]',
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(invalidUser)
+      .expect(400)
+
+    expect(response.body).toContain('username must be unique')
+
+    const users = await helper.usersInDb()
+    expect(users).toHaveLength(1)
+  })
+
 })
 
 afterAll(() => {

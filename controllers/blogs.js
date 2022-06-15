@@ -1,15 +1,19 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const { userExtractor } = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
   response.json(blogs)
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
+  const user = request.user
+
   if (!request.body.title) {
     return response.status(400).json('title must be included')
   }
+
   if (!request.body.url) {
     return response.status(400).json('url must be included')
   }
@@ -18,7 +22,14 @@ blogsRouter.post('/', async (request, response) => {
   if (!blog.likes) {
     blog.likes = 0
   }
+
+  blog.user = user._id
+
   const result = await blog.save()
+
+  user.blogs = user.blogs.concat(result._id)
+  await user.save()
+
   response.status(201).json(result)
 })
 
@@ -37,9 +48,17 @@ blogsRouter.put('/:id', async (request, response) => {
   response.status(200).json(result)
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
+  const user = request.user
+  const blog = await Blog.findById(request.params.id)
+
+  if (blog.user.toString() === user._id.toString()) {
+    await Blog.findByIdAndDelete(request.params.id)
+  }
+  else {
+    return response.status(401).json({ error: 'not allowed to delete this blog' })
+  }
+  return response.status(204).end()
 })
 
 module.exports = blogsRouter

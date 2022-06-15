@@ -1,0 +1,38 @@
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "mackzucky55",
+    "name": "Mark Zuck",
+    "password": "dontstopfighting@$$[]{id}"
+}
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "beanbread299",
+    "name": "Patrick Jose",
+    "password": "ihate@{love}[tip389]"
+}
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "jimcrow298",
+    "name": "Jim Crow",
+    "password": "vip{29}}[#1*1*#]"
+}
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "jamescrowther29",
+    "name": "James Crowther",
+    "password": "index[59][#69**{}]"
+}
