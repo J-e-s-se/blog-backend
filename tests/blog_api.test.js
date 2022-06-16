@@ -8,7 +8,22 @@ const helper = require('./test_helper')
 
 const api = supertest(app)
 
+let userAuth
+
 beforeEach(async () => {
+  await User.deleteMany({})
+  const username = 'falzbadman98'
+  const name = 'Falz Man'
+  const password = '298ei09{fz}'
+  const passwordHash = await bcrypt.hash(password, 10)
+  const user = new User({ username, name, passwordHash })
+  await user.save()
+
+  const response = await api
+    .post('/api/login')
+    .send({ username, password })
+
+  userAuth = response.body.token
   await Blog.deleteMany({})
   await Blog.insertMany(helper.initialBlogs)
 }, 100000)
@@ -36,6 +51,7 @@ describe('creating a new blog post', () => {
   test('succeeds with 201 when request data is valid', async () => {
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': `Bearer ${userAuth}` })
       .send(helper.validBlog)
       .expect(201)
 
@@ -55,6 +71,7 @@ describe('creating a new blog post', () => {
 
     const response = await api
       .post('/api/blogs')
+      .set({ 'Authorization': `Bearer ${userAuth}` })
       .send(blogWithNoLikes)
       .expect(201)
 
@@ -70,6 +87,7 @@ describe('creating a new blog post', () => {
 
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': `Bearer ${userAuth}` })
       .send(blogWithNoUrl)
       .expect(400)
 
@@ -81,25 +99,44 @@ describe('creating a new blog post', () => {
 
     await api
       .post('/api/blogs')
+      .set({ 'Authorization': `Bearer ${userAuth}` })
       .send(blogWithNoTitle)
       .expect(400)
 
     const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
+
+  test('fails with status code 401 if token is not provided', async () => {
+    const response = await api
+      .post('/api/blogs')
+      .send(helper.validBlog)
+      .expect(401)
+
+    expect(response.body).toEqual({ error: 'missing token' })
+  })
 })
 
 describe('deletion of a blog', () => {
+  beforeEach(async () => {
+    await api
+      .post('/api/blogs')
+      .set({ 'Authorization': `Bearer ${userAuth}` })
+      .send(helper.validBlog)
+
+  })
+
   test('succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
+    const blogToDelete = await Blog.findOne({ title: helper.validBlog.title })
 
     await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
+      .delete(`/api/blogs/${blogToDelete._id}`)
+      .set({ 'Authorization': `Bearer ${userAuth}` })
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
 
     const blogTitles = blogsAtEnd.map(blog => blog.title)
     expect(blogTitles).not.toContain(blogToDelete.title)
@@ -127,18 +164,6 @@ describe('updating a blog post', () => {
 })
 
 describe('creating a new user', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-
-    const username = 'falzbadman98'
-    const name = 'Falz Man'
-    const password = '298ei09{fz}'
-    const passwordHash = await bcrypt.hash(password, 10)
-
-    const user = new User({ username, name, passwordHash })
-    await user.save()
-
-  })
 
   test('fails with status code 400 when username is not given', async () => {
     const invalidUser = {
