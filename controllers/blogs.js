@@ -18,14 +18,18 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
     return response.status(400).json('url must be included')
   }
 
-  const blog = new Blog(request.body)
+  const { title, url, author, likes } = request.body
+  const blog = new Blog({ title, url, author, likes })
   if (!blog.likes) {
     blog.likes = 0
   }
 
   blog.user = user._id
 
+  console.log('creating blog', blog)
+
   const result = await blog.save()
+  console.log('saved result', result)
 
   user.blogs = user.blogs.concat(result._id)
   await user.save()
@@ -51,6 +55,15 @@ blogsRouter.put('/:id', async (request, response) => {
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   const user = request.user
   const blog = await Blog.findById(request.params.id)
+  const blogsList = await Blog.find({})
+  console.log('blogsList', blogsList)
+  console.log('id', request.params.id)
+  console.log('blog', blog)
+  console.log('user', user)
+
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
 
   if (blog.user.toString() === user._id.toString()) {
     await Blog.findByIdAndDelete(request.params.id)
@@ -58,6 +71,8 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   else {
     return response.status(401).json({ error: 'not allowed to delete this blog' })
   }
+  const blogafter = await Blog.find({})
+  console.log('blogsList after deletion', blogafter)
   return response.status(204).end()
 })
 

@@ -5,6 +5,9 @@
 		}
 	],
 	"settings": {
-		"eslint.nodePath": "myCustomNodePath"
+		"[javascript]": {
+			"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+		},
+  	"workbench.colorTheme": "Tokyo Night",
 	}
 }
